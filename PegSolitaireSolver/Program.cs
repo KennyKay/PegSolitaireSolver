@@ -29,12 +29,11 @@ namespace PegSolitaireSolver
                 return;
             }
 
-            var result = board.SolveRec(0);
+            var result = board.SolveRec();
 
             if (!result.Item1)
             {
                 Console.WriteLine("Board could not be solved");
-                return;
             }
             else
             {

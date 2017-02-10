@@ -14,8 +14,8 @@ namespace PegSolitaireSolver
     public enum Side : byte
     {
         Left,
-        Right,
         Up,
+        Right,
         Down
     }
 
@@ -37,17 +37,11 @@ namespace PegSolitaireSolver
             PlayableTokens(out playableTokens, out holes);
         }
 
-
         private Board(Box[][] grid, int playableTokens, List<Point> holes)
         {
             this.grid = grid;
             this.playableTokens = playableTokens;
-            this.holes = holes.ToList();
-        }
-
-        private Board(Board board) : this(board.grid, board.playableTokens, board.holes)
-        {
-
+            this.holes = holes;
         }
 
         private void PlayableTokens(out int count, out List<Point> holes)
@@ -113,7 +107,7 @@ namespace PegSolitaireSolver
             return true;
         }
 
-        public Tuple<bool, int> SolveRec(int node)
+        public Tuple<bool, int> SolveRec(int node = 1)
         {
             Print(node);
 
@@ -126,9 +120,9 @@ namespace PegSolitaireSolver
                 {
                     Point adjPoint;
                     Point nextPoint;
-                    if (GetBox(hole, side, 1, out adjPoint) == Box.Token && GetBox(hole, side, 2, out nextPoint) == Box.Token)
+                    if (GetBox(hole, side, 2, out nextPoint) == Box.Token && GetBox(hole, side, 1, out adjPoint) == Box.Token)
                     {
-                        var newBoard = new Board(this);
+                        var newBoard = this.Clone();
 
                         newBoard[adjPoint.Row][adjPoint.Column] = Box.Empty;
                         newBoard[nextPoint.Row][nextPoint.Column] = Box.Empty;
@@ -150,6 +144,19 @@ namespace PegSolitaireSolver
             }
 
             return new Tuple<bool, int>(false, node);
+        }
+
+        private Board Clone()
+        {
+            var newgrid = new Box[Length][];
+            for (var i = 0; i < Length; i++)
+            {
+                newgrid[i] = new Box[this[i].Length];
+                for (int j = 0; j < this[i].Length; j++)
+                    newgrid[i][j] = grid[i][j];
+            }
+
+            return new Board(newgrid, playableTokens, holes.ToList());
         }
 
         private bool IsSolved()
