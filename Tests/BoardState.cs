@@ -14,9 +14,9 @@ namespace Tests
             {
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
-                new Box[] {0, 0, 0, Box.Token, 0, 0, 0},
-                new Box[] {0, 0, 0, Box.Token, 0, 0, 0},
-                new Box[] {0, 0, 0, Box.Empty, 0, 0, 0},
+                new Box[] {0, 0, 0, Box.Peg, 0, 0, 0},
+                new Box[] {0, 0, 0, Box.Peg, 0, 0, 0},
+                new Box[] {0, 0, 0, Box.Hole, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
             };
@@ -32,7 +32,7 @@ namespace Tests
             {
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
-                new Box[] {0, 0, 0, Box.Token, 0, 0, 0},
+                new Box[] {0, 0, 0, Box.Peg, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
@@ -52,7 +52,7 @@ namespace Tests
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
-                new Box[] {0, 0, 0, Box.Empty, 0, 0, 0},
+                new Box[] {0, 0, 0, Box.Hole, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
                 new Box[] {0, 0, 0, 0, 0, 0, 0},
             };

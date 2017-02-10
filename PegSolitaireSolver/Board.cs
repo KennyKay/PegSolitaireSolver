@@ -7,8 +7,8 @@ namespace PegSolitaireSolver
     public enum Box : byte
     {
         Wall = 0,
-        Token = 1,
-        Empty = 2
+        Peg = 1,
+        Hole = 2
     }
 
     public enum Side : byte
@@ -22,36 +22,36 @@ namespace PegSolitaireSolver
     public class Board
     {
         private readonly Box[][] grid;
-        private readonly int playableTokens;
+        private readonly int boxCount;
         private readonly List<Point> holes;
 
         public int Length => grid.Length;
 
-        public int Tokens => playableTokens - holes.Count;
+        public int PegCount => boxCount - holes.Count;
 
         public Box[] this[int index] => grid[index];
 
         public Board(Box[][] grid)
         {
             this.grid = grid;
-            PlayableTokens(out playableTokens, out holes);
+            PlayableBoxes(out boxCount, out holes);
         }
 
-        private Board(Box[][] grid, int playableTokens, List<Point> holes)
+        private Board(Box[][] grid, int boxCount, List<Point> holes)
         {
             this.grid = grid;
-            this.playableTokens = playableTokens;
+            this.boxCount = boxCount;
             this.holes = holes;
         }
 
-        private void PlayableTokens(out int count, out List<Point> holes)
+        private void PlayableBoxes(out int count, out List<Point> holes)
         {
             count = 0;
             holes = new List<Point>();
             for (int i = 0; i < grid.Length; i++)
             for (int j = 0; j < grid[i].Length; j++)
             {
-                if (grid[i][j].Equals(Box.Empty))
+                if (grid[i][j].Equals(Box.Hole))
                     holes.Add(new Point(i, j));
 
                 if (!grid[i][j].Equals(Box.Wall))
@@ -89,21 +89,10 @@ namespace PegSolitaireSolver
 
         public bool IsValid()
         {
-            if (Tokens < 1)
+            if (PegCount < 1)
                 return false;
-            if (holes.Count == 0 && Tokens != 1)
+            if (holes.Count == 0 && PegCount != 1)
                 return false;
-
-            // TODO: Check if all tokens have at least one token or an empty Box next to it
-
-            var validBoard = new bool[grid.Length];
-
-            for (int i = 0; i < grid.Length; i++)
-            {
-                for (int j = 0; j < grid[i].Length; j++)
-                {
-                }
-            }
             return true;
         }
 
@@ -114,54 +103,62 @@ namespace PegSolitaireSolver
             if (IsSolved())
                 return new Tuple<bool, int>(true, node);
 
-            foreach (var hole in holes)
+            var moves = GetPossibleMoves();
+
+            foreach (var move in moves)
             {
-                foreach (Side side in Enum.GetValues(typeof(Side)))
-                {
-                    Point adjPoint;
-                    Point nextPoint;
-                    if (GetBox(hole, side, 2, out nextPoint) == Box.Token && GetBox(hole, side, 1, out adjPoint) == Box.Token)
-                    {
-                        var newBoard = this.Clone();
+                var newBoard = this.Clone();
 
-                        newBoard[adjPoint.Row][adjPoint.Column] = Box.Empty;
-                        newBoard[nextPoint.Row][nextPoint.Column] = Box.Empty;
-                        newBoard[hole.Row][hole.Column] = Box.Token;
+                var to = move.To;
+                var jumped = move.Jumped;
+                var from = move.From;
 
-                        newBoard.holes.Remove(hole);
-                        newBoard.holes.Add(adjPoint);
-                        newBoard.holes.Add(nextPoint);
+                newBoard[jumped.Row][jumped.Column] = Box.Hole;
+                newBoard[from.Row][from.Column] = Box.Hole;
+                newBoard[to.Row][to.Column] = Box.Peg;
 
-                        node++;
+                newBoard.holes.Remove(to);
+                newBoard.holes.Add(jumped);
+                newBoard.holes.Add(from);
 
-                        var result = newBoard.SolveRec(node);
-                        if (result.Item1)
-                            return result;
+                node++;
 
-                        node = result.Item2;
-                    }
-                }
+                var result = newBoard.SolveRec(node);
+                node = result.Item2;
+
+                if (result.Item1)
+                    return result;
             }
 
             return new Tuple<bool, int>(false, node);
         }
 
+        private IEnumerable<Move> GetPossibleMoves()
+        {
+            foreach (var hole in holes)
+            foreach (Side side in Enum.GetValues(typeof(Side)))
+            {
+                Point jumped;
+                Point from;
+                if (GetBox(hole, side, 2, out from) == Box.Peg && GetBox(hole, side, 1, out jumped) == Box.Peg)
+                    yield return new Move(from, jumped, hole);
+            }
+        }
+
         private Board Clone()
         {
             var newgrid = new Box[Length][];
-            for (var i = 0; i < Length; i++)
+            Enumerable.Range(0, Length).AsParallel().ForAll(i =>
             {
-                newgrid[i] = new Box[this[i].Length];
-                for (int j = 0; j < this[i].Length; j++)
-                    newgrid[i][j] = grid[i][j];
-            }
-
-            return new Board(newgrid, playableTokens, holes.ToList());
+                newgrid[i] = new Box[grid[i].Length];
+                Array.Copy(grid[i], newgrid[i], grid[i].Length);
+            });
+            return new Board(newgrid, boxCount, holes.ToList());
         }
 
         private bool IsSolved()
         {
-            return playableTokens - holes.Count == 1;
+            return boxCount - holes.Count == 1;
         }
 
         public void Print(int node)
