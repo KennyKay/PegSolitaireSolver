@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PegSolitaireSolver
@@ -185,15 +186,14 @@ namespace PegSolitaireSolver
             return true;
         }
 
-        public Tuple<bool, int> SolveRec(LinkedList<Board> visitedBoards, int node = 0)
+        public Tuple<bool, int> SolveRec(LinkedList<Board> visitedBoards, Stopwatch stopWatch, int node = 0)
         {
+            stopWatch.Stop();
             Print(node);
+            stopWatch.Start();
 
             if (IsSolved())
                 return new Tuple<bool, int>(true, node);
-
-
-            // TODO check if board is symmetrical and all equivalent rotated / mirrored boards in the visitedBoard list
 
             var moves = GetPossibleMoves();
 
@@ -205,7 +205,7 @@ namespace PegSolitaireSolver
             {
                 node++;
 
-                var result = successor.SolveRec(visitedBoards, node);
+                var result = successor.SolveRec(visitedBoards, stopWatch, node);
                 node = result.Item2;
 
                 if (result.Item1)

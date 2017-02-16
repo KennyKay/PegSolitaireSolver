@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,11 @@ namespace PegSolitaireSolver
 
             var visitedBoards = new LinkedList<Board>();
 
-            var result = board.SolveRec(visitedBoards);
+            var stopWatch = new Stopwatch();
+
+            stopWatch.Start();
+            var result = board.SolveRec(visitedBoards, stopWatch);
+            stopWatch.Stop();
 
             if (!result.Item1)
             {
@@ -42,6 +47,9 @@ namespace PegSolitaireSolver
                 Console.WriteLine("Board solved");
                 Console.WriteLine("Nodes visited : " + result.Item2);
             }
+
+
+            Console.WriteLine("Time : " + stopWatch.ElapsedMilliseconds * 0.001 + " seconds");
         }
     }
 }
