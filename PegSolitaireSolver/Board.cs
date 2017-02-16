@@ -245,10 +245,11 @@ namespace PegSolitaireSolver
 
         private static readonly Side[] Sides = {Side.Left, Side.Up, Side.Right, Side.Down};
 
+        private static readonly Random rnd = new Random();
+
         public IEnumerable<Move> GetPossibleMoves()
         {
 
-            var rnd = new Random();
             var randomlyOrderedSides = Sides.OrderBy(i => rnd.Next());
 
             foreach (var hole in holes)
@@ -265,7 +266,6 @@ namespace PegSolitaireSolver
         {
             var dictPegMoves = new Dictionary<Point, IEnumerable<Move>>();
 
-            var rnd = new Random();
             var randomlyOrderedSides = Sides.OrderBy(i => rnd.Next());
 
             for (int i = 0; i < this.Length; i++)
