@@ -29,7 +29,9 @@ namespace PegSolitaireSolver
                 return;
             }
 
-            var result = board.SolveRec();
+            var visitedBoards = new LinkedList<Board>();
+
+            var result = board.SolveRec(visitedBoards);
 
             if (!result.Item1)
             {
