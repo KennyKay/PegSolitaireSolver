@@ -236,31 +236,10 @@ namespace PegSolitaireSolver
                 if (visitedBoards.Contains(newBoard))
                     continue;
 
-                AddEquivalentBoards(visitedBoards, newBoard);
+                visitedBoards.AddLast(newBoard);
 
 
                 yield return newBoard;
-            }
-        }
-
-        private void AddEquivalentBoards(LinkedList<Board> visitedBoards, Board board)
-        {
-            visitedBoards.AddLast(this);
-            // todo: get all equivalent boards
-            switch (symmetry)
-            {
-                case Symmetry.None:
-                    break;
-                case Symmetry.Horizontal:
-                    break;
-                case Symmetry.Vertical:
-                    break;
-                case Symmetry.HorizontalAndVertical:
-                    break;
-                case Symmetry.Complete:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -338,12 +317,71 @@ namespace PegSolitaireSolver
         
         protected bool Equals(Board other)
         {
-            for (int i = 0; i < this.Length; i++)
-                for (int j = 0; j < this[i].Length; j++)
-                    if (this[i][j] != other[i][j])
-                        return false;
+            var maxLength = 6;
+
+            switch (symmetry)
+            {
+                case Symmetry.None:
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != other[i][j])
+                                return false;
+                    break;
+                case Symmetry.Horizontal:
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != other[i][j] || this[i][j] != other[maxLength - i][j])
+                                return false;
+                    break;
+                case Symmetry.Vertical:
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != other[i][j] || this[i][j] != other[i][maxLength - j])
+                                return false;
+                    break;
+                case Symmetry.HorizontalAndVertical:
+
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != other[i][j] || this[i][j] != other[maxLength - i][j]  || this[i][j] != other[i][maxLength - j])
+                                return false;
+                    break;
+                case Symmetry.Complete:
+
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != other[i][j] || this[i][j] != other[maxLength - i][j] || this[i][j] != other[i][maxLength - j])
+                                return false;
+
+                    var rotatedGrid = RotateMatrix(this.grid, 6);
+
+                    for (int i = 0; i < this.Length; i++)
+                        for (int j = 0; j < this[i].Length; j++)
+                            if (this[i][j] != rotatedGrid[i][j] || this[i][j] != rotatedGrid[maxLength - i][j] || this[i][j] != rotatedGrid[i][maxLength - j])
+                                return false;
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             return true;
+        }
+        static Box[][] RotateMatrix(Box[][] matrix, int n)
+        {
+            var ret = new Box[n][];
+
+            for (int i = 0; i < n; ++i)
+            {
+                ret[i] = new Box[n];
+
+                for (int j = 0; j < n; ++j)
+                {
+                    ret[i][j] = matrix[n - j - 1][i];
+                }
+            }
+
+            return ret;
         }
 
         public override bool Equals(object obj)
