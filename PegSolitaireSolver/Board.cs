@@ -158,7 +158,7 @@ namespace PegSolitaireSolver
 
         private bool IsSolved()
         {
-            return boxCount - holes.Count == 1;
+            return PegCount == 1;
         }
 
         public void Print(int node)
